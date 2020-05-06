@@ -97,7 +97,97 @@ class ArticleService extends BaseServiceV2 {
         }
         return this.cleanArticleBackgroundMusicSlides(this.cleanArticleSilentSlides(clonedArticle));
     }
-   
+    
+    generateTranslatableArticle({ articleId, signLang, lang, langName, tts, }) {
+        return new Promise((resolve, reject) => {
+            let originalArticle;
+            let clonedArticle;
+            this.findById(articleId)
+                .then((originalArticleDoc) => {
+                    if (!originalArticleDoc) throw new Error('Invalid article id');
+                    originalArticle = originalArticleDoc.toObject();
+    
+                    const query = {
+                        originalArticle: originalArticle._id,
+                        langCode: lang,
+                        archived: false,
+                    }
+                    if (signLang) {
+                        query.signLangCode = lang;
+                        query.signLang = true;
+                    } else {
+                        query.langCode = lang;
+                    }
+                    if (langName) {
+                        query.langName = langName;
+                    }
+                    if (tts) {
+                        query.tts = true;
+                    } else {
+                        query.tts = false;
+                    }
+                    return this.find(query)
+                })
+                .then((articleDoc) => {
+                    if (articleDoc && articleDoc.length > 0) return resolve({ article: articleDoc[0].toObject(), originalArticle });
+                    this.cloneArticle(articleId)
+                        .then((clonedArticleDoc) => {
+                            clonedArticle = clonedArticleDoc;
+                            if (clonedArticle.toObject) {
+                                clonedArticle = clonedArticle.toObject();
+                            }
+                            clonedArticle.slides.forEach(slide => {
+                                slide.content.forEach((subslide) => {
+                                    if (subslide.speakerProfile && subslide.speakerProfile.speakerNumber === -1) {
+                                        console.log('')
+                                    } else {
+                                        subslide.audio = '';
+                                    }
+                                })
+                            });
+                            const newArticleUpdate = { articleType: 'translation', langName, slides: clonedArticle.slides, archived: false };
+                            if (signLang) {
+                                newArticleUpdate.signLang = true;
+                                newArticleUpdate.langName = ''
+                                clonedArticle.signLang = true;
+                                clonedArticle.langName = '';
+                            }
+                            clonedArticle.langCode = lang
+                            newArticleUpdate.langCode = lang;
+                            if (tts) {
+                                newArticleUpdate.tts = true;
+                            }
+                            return this.update({ _id: clonedArticle._id }, newArticleUpdate);
+                        })
+                        .then(() => {
+                            return new Promise((resolve, reject) => {
+                                // if ()
+                                clonedArticle.langCode = lang;
+                                if (tts) {
+                                    clonedArticle.tts = true;
+                                }
+                                if (!clonedArticle.signLang && clonedArticle.langCode !== originalArticle.langCode && originalArticle.langCode.indexOf(clonedArticle.langCode) !== 0) {
+                                    return resolve(clonedArticle);
+                                } else {
+                                    this.update({ _id: clonedArticle._id }, { translationProgress: 100 })
+                                        .then(() => {
+                                            clonedArticle.translationProgress = 100;
+                                            return resolve(clonedArticle);
+                                        })
+                                        .catch(reject)
+                                }
+                            })
+                        })
+                        .then((article) => {
+                            console.log('Created Article');
+                            return resolve({ article: this.cleanArticleSilentAndBackgroundMusicSlides(article), originalArticle, created: true });
+                        })
+                })
+                .catch(err => {
+                    return reject(err);
+                })
+        })
+    }
 }
 
 

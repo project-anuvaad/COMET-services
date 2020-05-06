@@ -1,7 +1,7 @@
 const path = require('path')
 const ejs = require('ejs');
 
-module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PROTOCOL }) => {
+module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PROTOCOL, VIDEOWIKI_WHATSAPP_NUMBER }) => {
     const emailVendor = require('./vendor')(EMAIL_SERVICE_API_ROOT);
     
     const inviteUserToOrganization = ({ from, to, organization, inviteToken }) => {
