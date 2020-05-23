@@ -108,7 +108,7 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
                 title: 'VideoWiki Invitation To reviw Email',
                 content: `"${from.email}" from "${organizationName}" invited you to review the video "${videoTitle}"`,
                 buttonTitle: `Go to video`,
-                targetURL: `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/convert/v2/${videoId}`)}`,
+                targetURL: `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/convert?video=${videoId}`)}`,
                 note: `This invitation was intended for ${to.email}. If you were not expecting this invitation, you can ignore this email.`,
             }
             ejs.renderFile(path.join(__dirname, 'templates', 'single_action.ejs'), renderData, (err, htmlToSend) => {
@@ -135,7 +135,7 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
             const subject = `${organizationName}: Invitation to verify a video (${videoTitle})`
 
             const renderData = {
-                acceptURL: `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/convert/v2/${videoId}`)}`,
+                acceptURL: `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/convert?video=${videoId}`)}`,
                 organizationName,
                 fromUser: from.email,
                 toUser: to.email,
@@ -196,7 +196,37 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
                 title: 'VideoWiki: Review verify',
                 content: `"${from.email}" from "${organizationName}" marked the video "${videoTitle}" as done and ready to be verified`,
                 buttonTitle: `Go to video`,
-                targetURL: `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/convert/v2/${videoId}`)}`,
+                targetURL: `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/convert?video=${videoId}`)}`,
+                note: `This email was intended for ${to.email}. If you were not expecting this invitation, you can ignore this email.`,
+            }
+            ejs.renderFile(path.join(__dirname, 'templates', 'single_action.ejs'), renderData, (err, htmlToSend) => {
+                if (err) return reject(err);
+                // setup e-mail data, even with unicode symbols
+                const mailOptions = {
+                    from: 'Videowiki <help@videowiki.org>',
+                    to: to.email,
+                    subject,
+                    html: htmlToSend
+                };
+
+                emailVendor.send(mailOptions, function (error, body) {
+                    console.log(error, body);
+                    if (err) return reject(err);
+                    return resolve(body);
+                })
+            })
+        })
+    }
+
+    const notifyUserVideoProofreadingReady = ({ to, organizationName, videoTitle, videoId, inviteToken, organizationId }) => {
+        return new Promise((resolve, reject) => {
+            const subject = `${organizationName}: the video (${videoTitle}) is now ready for proofreading`
+
+            const renderData = {
+                title: 'VideoWiki: Video ready for proofreading',
+                content: `${organizationName}: the video (${videoTitle}) is now ready for proofreading`,
+                buttonTitle: `Go to video`,
+                targetURL: `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/convert?video=${videoId}`)}`,
                 note: `This email was intended for ${to.email}. If you were not expecting this invitation, you can ignore this email.`,
             }
             ejs.renderFile(path.join(__dirname, 'templates', 'single_action.ejs'), renderData, (err, htmlToSend) => {
@@ -243,5 +273,6 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
         notifyUserReviewMarkedDone,
         resetUserPassord,
         sendVideoContributionUploadedMessage,
+        notifyUserVideoProofreadingReady,
     }
 }
