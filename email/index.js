@@ -3,7 +3,7 @@ const ejs = require('ejs');
 
 module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PROTOCOL, VIDEOWIKI_WHATSAPP_NUMBER }) => {
     const emailVendor = require('./vendor')(EMAIL_SERVICE_API_ROOT);
-    
+
     const inviteUserToOrganization = ({ from, to, organization, inviteToken }) => {
         return new Promise((resolve, reject) => {
             const renderData = {
@@ -100,14 +100,16 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
         })
     }
 
-    const inviteUserToReview = ({ from, to, organizationName, videoTitle, videoId, inviteToken, organizationId }) => {
+    const inviteUserToReview = ({ from, to, organizationName, videoTitle, videoId, whatsappUrl, inviteToken, organizationId }) => {
         return new Promise((resolve, reject) => {
             const subject = `${organizationName}: Invitation to proofread a video (${videoTitle})`
 
             const renderData = {
-                title: 'VideoWiki Invitation To reviw Email',
-                content: `"${from.email}" from "${organizationName}" invited you to review the video "${videoTitle}"`,
+                title: 'VideoWiki Invitation To Transcribe Email',
+                content: `"${from.email}" from "${organizationName}" invited you to Transcribe the video "${videoTitle}"`,
                 buttonTitle: `Go to video`,
+                whatsappUrl,
+                whatsappButtonTitle: 'Transcribe on WhatsApp',
                 targetURL: `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/convert?video=${videoId}`)}`,
                 note: `This invitation was intended for ${to.email}. If you were not expecting this invitation, you can ignore this email.`,
             }
