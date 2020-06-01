@@ -31,7 +31,7 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
         })
     }
 
-    const inviteUserToTranslate = ({ from, to, organizationName, videoTitle, articleId, fromLang, toLang, toLangCode, extraContent, inviteToken, organizationId }) => {
+    const inviteUserToTranslate = ({ from, to, organizationName, videoTitle, articleId, fromLang, toLang, whatsappUrl, extraContent, inviteToken, organizationId }) => {
         return new Promise((resolve, reject) => {
 
             const subject = `${organizationName}: Invitation to translate a video (${videoTitle})`
@@ -45,6 +45,8 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
                 note: `This invitation was intended for "${to.email}". If you were not expecting this invitation, you can ignore this email.`,
                 acceptURL,
                 declineURL,
+                whatsappUrl,
+                whatsappButtonTitle: 'Translate on WhatsApp',
                 extraContent,
             }
             ejs.renderFile(path.join(__dirname, 'templates', 'accept_decline.ejs'), renderData, (err, htmlToSend) => {
