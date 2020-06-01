@@ -221,14 +221,44 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
             })
         })
     }
-
-    const notifyUserVideoProofreadingReady = ({ to, organizationName, videoTitle, videoId, inviteToken, organizationId }) => {
+    
+    const notifyUserReviewMarkedDone = ({ from, to, organizationName, videoTitle, videoId, inviteToken, organizationId }) => {
         return new Promise((resolve, reject) => {
-            const subject = `${organizationName}: the video (${videoTitle}) is now ready for proofreading`
+            const subject = `${organizationName}: the video (${videoTitle}) review was marked as done`
 
             const renderData = {
-                title: 'VideoWiki: Video ready for proofreading',
-                content: `${organizationName}: the video (${videoTitle}) is now ready for proofreading`,
+                title: 'VideoWiki: Review verify',
+                content: `"${from.email}" from "${organizationName}" marked the video "${videoTitle}" as done and ready to be verified`,
+                buttonTitle: `Go to video`,
+                targetURL: `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/convert?video=${videoId}`)}`,
+                note: `This email was intended for ${to.email}. If you were not expecting this invitation, you can ignore this email.`,
+            }
+            ejs.renderFile(path.join(__dirname, 'templates', 'single_action.ejs'), renderData, (err, htmlToSend) => {
+                if (err) return reject(err);
+                // setup e-mail data, even with unicode symbols
+                const mailOptions = {
+                    from: 'Videowiki <help@videowiki.org>',
+                    to: to.email,
+                    subject,
+                    html: htmlToSend
+                };
+
+                emailVendor.send(mailOptions, function (error, body) {
+                    console.log(error, body);
+                    if (err) return reject(err);
+                    return resolve(body);
+                })
+            })
+        })
+    }
+
+    const notifyUserAITranscriptionFinish = ({ to, organizationName, videoTitle, videoId, inviteToken, organizationId }) => {
+        return new Promise((resolve, reject) => {
+            const subject = `${organizationName}: the video (${videoTitle}) AI Transcription is finished`
+
+            const renderData = {
+                title: 'VideoWiki: Video AI Transcription finished',
+                content: `${organizationName}: the video (${videoTitle}) AI Transcription is finished`,
                 buttonTitle: `Go to video`,
                 targetURL: `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/convert?video=${videoId}`)}`,
                 note: `This email was intended for ${to.email}. If you were not expecting this invitation, you can ignore this email.`,
@@ -278,5 +308,6 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
         resetUserPassord,
         sendVideoContributionUploadedMessage,
         notifyUserVideoProofreadingReady,
+        notifyUserAITranscriptionFinish,
     }
 }
