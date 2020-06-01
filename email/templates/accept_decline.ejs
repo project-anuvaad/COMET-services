@@ -62,7 +62,7 @@
     width: auto!important;" >Decline</a>
 	<p>
 
- <% if (whatsappUrl) { %>
+ <% if (typeof(whatsappUrl) === 'string' && whatsappUrl) { %>
 
       <br />
       <a href="<%= whatsappUrl %>" target="_blank" style="background: #28a73f linear-gradient(-180deg,#34d058 0%,#28a745 90%);

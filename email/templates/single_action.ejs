@@ -44,7 +44,7 @@
     text-align: center;
     text-decoration: none;
     width: auto!important;" ><%= buttonTitle %></a>
-    <% if (whatsappUrl) { %>
+    <% if (typeof(whatsappUrl) === 'string' && whatsappUrl) { %>
       <a href="<%= whatsappUrl %>" target="_blank" style="background: #28a73f linear-gradient(-180deg,#34d058 0%,#28a745 90%);
         border-radius: 5px;
         color: #fff;
