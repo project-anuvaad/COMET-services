@@ -1,6 +1,6 @@
 {
   "name": "@videowiki/services",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "Services wrappers",
   "main": "index.js",
   "scripts": {
