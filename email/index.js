@@ -169,7 +169,7 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
             const subject = `Videowiki: Reset Password`
 
             const renderData = {
-                resetPasswordUrl: `${FRONTEND_HOST_PROTOCOL}://www.${FRONTEND_HOST_NAME}/rp?rc=${resetCode}&email=${to.email}`,
+                resetPasswordUrl: `${FRONTEND_HOST_PROTOCOL}://${FRONTEND_HOST_NAME}/rp?rc=${resetCode}&email=${to.email}`,
                 userName: `${to.firstname} ${to.lastname}`,
                 userEmail: to.email,
             }
