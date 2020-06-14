@@ -31,6 +31,42 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
         })
     }
 
+    const inviteUserToTranslateText = ({ from, to, organizationName, videoTitle, articleId, fromLang, toLang, whatsappUrl, inviteToken, organizationId }) => {
+        return new Promise((resolve, reject) => {
+
+            const subject = `${organizationName}: Invitation to translate a video (${videoTitle})`
+
+            const acceptURL = `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/invitations/translateText?t=${inviteToken}&o=${organizationId}&aid=${articleId}&s=accepted&email=${to.email}`
+
+            const declineURL = `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/invitations/translateText?t=${inviteToken}&o=${organizationId}&aid=${articleId}&s=declined&email=${to.email}`
+            const renderData = {
+                title: 'VideoWiki Invitation To Translate',
+                content: `"${from.email}" from "${organizationName}" invited you to translate the video's text "${videoTitle}" from ${fromLang} to ${toLang}.`,
+                note: `This invitation was intended for "${to.email}". If you were not expecting this invitation, you can ignore this email.`,
+                acceptURL,
+                declineURL,
+                whatsappUrl,
+                whatsappButtonTitle: 'Translate Text on WhatsApp',
+            }
+            ejs.renderFile(path.join(__dirname, 'templates', 'accept_decline.ejs'), renderData, (err, htmlToSend) => {
+                if (err) return reject(err);
+                // setup e-mail data, even with unicode symbols
+                const mailOptions = {
+                    from: 'Videowiki <help@videowiki.org>',
+                    to: to.email,
+                    subject,
+                    html: htmlToSend
+                };
+
+                emailVendor.send(mailOptions, function (error, body) {
+                    console.log(error, body);
+                    if (err) return reject(err);
+                    return resolve(body);
+                })
+            })
+        })
+    }
+
     const inviteUserToTranslate = ({ from, to, organizationName, videoTitle, articleId, fromLang, toLang, whatsappUrl, extraContent, inviteToken, organizationId }) => {
         return new Promise((resolve, reject) => {
 
@@ -299,6 +335,7 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
     }
     return {
         inviteUserToOrganization,
+        inviteUserToTranslateText,
         inviteUserToTranslate,
         inviteUserToReview,
         inviteUserToVerifyVideo,

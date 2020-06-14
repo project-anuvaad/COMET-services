@@ -24,7 +24,9 @@
     <br>
     <%= content %>
     <br>
+    <% if (typeof extraContent === 'string') { %>
     <small><strong><%= extraContent %></strong></small>
+    <% } %>
   </td>
  </tr>
  <tr>
