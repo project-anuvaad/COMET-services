@@ -23,6 +23,10 @@
     line-height: 20px;">
     <br>
     <%= content %>
+    <% if (typeof extraContent === 'string') { %>
+      <br>
+      <small><strong><%= extraContent %></strong></small
+    <% } %>
   </td>
  </tr>
  <tr>
