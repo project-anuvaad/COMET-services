@@ -149,6 +149,8 @@ class ArticleService extends BaseServiceV2 {
                             if (signLang) {
                                 newArticleUpdate.signLang = true;
                                 newArticleUpdate.langName = ''
+                                newArticleUpdate.stage = 'signlanguage_translation';
+                                clonedArticle.stage = 'signlanguage_translation';
                                 clonedArticle.signLang = true;
                                 clonedArticle.langName = '';
                             }
