@@ -155,6 +155,7 @@ class ArticleService extends BaseServiceV2 {
                                 clonedArticle.langName = '';
                             } else {
                                 newArticleUpdate.stage = 'text_translation';
+                                clonedArticle.stage = 'text_translation';
                             }
                             clonedArticle.langCode = lang
                             newArticleUpdate.langCode = lang;
