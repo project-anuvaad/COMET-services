@@ -145,14 +145,16 @@ class ArticleService extends BaseServiceV2 {
                                     }
                                 })
                             });
-                            const newArticleUpdate = { articleType: 'translation', stage: 'text_translation', langName, slides: clonedArticle.slides, archived: false };
+                            const newArticleUpdate = { articleType: 'translation', langName, slides: clonedArticle.slides, archived: false };
                             if (signLang) {
                                 newArticleUpdate.signLang = true;
                                 newArticleUpdate.langName = ''
-                                newArticleUpdate.stage = 'signlanguage_translation';
-                                clonedArticle.stage = 'signlanguage_translation';
+                                // newArticleUpdate.stage = 'signlanguage_translation';
+                                // clonedArticle.stage = 'signlanguage_translation';
                                 clonedArticle.signLang = true;
                                 clonedArticle.langName = '';
+                            } else {
+                                newArticleUpdate.stage = 'text_translation';
                             }
                             clonedArticle.langCode = lang
                             newArticleUpdate.langCode = lang;
