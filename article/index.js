@@ -98,7 +98,7 @@ class ArticleService extends BaseServiceV2 {
         return this.cleanArticleBackgroundMusicSlides(this.cleanArticleSilentSlides(clonedArticle));
     }
     
-    generateTranslatableArticle({ articleId, signLang, lang, langName, tts, }) {
+    generateTranslatableArticle({ articleId, signLang, lang, langName, tts, createdBy }) {
         return new Promise((resolve, reject) => {
             let originalArticle;
             let clonedArticle;
@@ -156,6 +156,10 @@ class ArticleService extends BaseServiceV2 {
                             } else {
                                 newArticleUpdate.stage = 'text_translation';
                                 clonedArticle.stage = 'text_translation';
+                            }
+                            if (createdBy) {
+                                clonedArticle.createdBy = createdBy; 
+                                newArticleUpdate.createdBy = createdBy;
                             }
                             clonedArticle.langCode = lang
                             newArticleUpdate.langCode = lang;
