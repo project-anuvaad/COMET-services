@@ -31,6 +31,40 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
         })
     }
 
+    const inviteUserToLeadTranslation = ({ from, to, organizationName, videoTitle, articleId, fromLang, toLang, inviteToken, organizationId }) => {
+        return new Promise((resolve, reject) => {
+
+            const subject = `${organizationName}: Invitation to lead a translation for the video (${videoTitle})`
+
+            const targetURL = `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/translation/article/${articleId}`)}`;
+
+            const renderData = {
+                title: 'VideoWiki Invitation To Lead Translation',
+                content: `"${from.email}" from "${organizationName}" assigned you to lead the translation of ${videoTitle} from ${fromLang} to ${toLang}.`,
+                note: `This invitation was intended for "${to.email}". If you were not expecting this invitation, you can ignore this email.`,
+                targetURL,
+                extraContent: '',
+                buttonTitle: 'Go to translation'
+            }
+            ejs.renderFile(path.join(__dirname, 'templates', 'single_action.ejs'), renderData, (err, htmlToSend) => {
+                if (err) return reject(err);
+                // setup e-mail data, even with unicode symbols
+                const mailOptions = {
+                    from: 'Videowiki <help@videowiki.org>',
+                    to: to.email,
+                    subject,
+                    html: htmlToSend
+                };
+
+                emailVendor.send(mailOptions, function (error, body) {
+                    console.log(error, body);
+                    if (err) return reject(err);
+                    return resolve(body);
+                })
+            })
+        })
+    }
+
     const inviteUserToTranslateText = ({ from, to, organizationName, videoTitle, articleId, fromLang, toLang, whatsappUrl, inviteToken, organizationId }) => {
         return new Promise((resolve, reject) => {
 
@@ -505,5 +539,6 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
         notifyUserVoiceoverTranslationStageReady,
         notifyUserVoiceoverTranslationStageDone,
         sendBulkExportTranslationsZipFile,
+        inviteUserToLeadTranslation,
     }
 }
