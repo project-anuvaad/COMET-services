@@ -65,6 +65,38 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
         })
     }
 
+
+    const inviteUserToLeadVideoTranslations = ({ from, to, organizationName, videoTitle, videoId, inviteToken, organizationId }) => {
+        return new Promise((resolve, reject) => {
+            const subject = `${organizationName}: Invitation to lead translation of the video (${videoTitle})`
+            const targetURL = `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/videos/translations/${videoId}`)}`;
+            const renderData = {
+                title: 'VideoWiki Invitation To Lead Video Translation',
+                content: `"${from.email}" from "${organizationName}" assigned you to lead the translations of ${videoTitle}.`,
+                note: `This invitation was intended for "${to.email}". If you were not expecting this invitation, you can ignore this email.`,
+                targetURL,
+                extraContent: '',
+                buttonTitle: 'Go to video'
+            }
+            ejs.renderFile(path.join(__dirname, 'templates', 'single_action.ejs'), renderData, (err, htmlToSend) => {
+                if (err) return reject(err);
+                // setup e-mail data, even with unicode symbols
+                const mailOptions = {
+                    from: 'Videowiki <help@videowiki.org>',
+                    to: to.email,
+                    subject,
+                    html: htmlToSend
+                };
+
+                emailVendor.send(mailOptions, function (error, body) {
+                    console.log(error, body);
+                    if (err) return reject(err);
+                    return resolve(body);
+                })
+            })
+        })
+    }
+
     const inviteUserToTranslateText = ({ from, to, organizationName, videoTitle, articleId, fromLang, toLang, whatsappUrl, inviteToken, organizationId }) => {
         return new Promise((resolve, reject) => {
 
@@ -233,6 +265,7 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
             })
         })
     }
+
 
     const resetUserPassord = ({ to, resetCode }) => {
         return new Promise((resolve, reject) => {
@@ -540,5 +573,6 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
         notifyUserVoiceoverTranslationStageDone,
         sendBulkExportTranslationsZipFile,
         inviteUserToLeadTranslation,
+        inviteUserToLeadVideoTranslations,
     }
 }
