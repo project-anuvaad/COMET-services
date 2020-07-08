@@ -69,7 +69,7 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
     const inviteUserToLeadVideoTranslations = ({ from, to, organizationName, videoTitle, videoId, inviteToken, organizationId }) => {
         return new Promise((resolve, reject) => {
             const subject = `${organizationName}: Invitation to lead translation of the video (${videoTitle})`
-            const targetURL = `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/videos/translations/${videoId}`)}`;
+            const targetURL = `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/organization/videos/translations/${videoId}`)}`;
             const renderData = {
                 title: 'VideoWiki Invitation To Lead Video Translation',
                 content: `"${from.email}" from "${organizationName}" assigned you to lead the translations of ${videoTitle}.`,
