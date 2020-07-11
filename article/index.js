@@ -143,6 +143,10 @@ class ArticleService extends BaseServiceV2 {
                                     } else {
                                         subslide.audio = '';
                                     }
+                                    // For TTS translations make the audio speed 0.9
+                                    if (tts) {
+                                        subslide.audioSpeed = 0.9;
+                                    }
                                 })
                             });
                             const newArticleUpdate = { articleType: 'translation', langName, slides: clonedArticle.slides, archived: false };
