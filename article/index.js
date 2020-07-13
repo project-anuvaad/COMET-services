@@ -145,7 +145,7 @@ class ArticleService extends BaseServiceV2 {
                                     }
                                     // For TTS translations make the audio speed 0.9
                                     if (tts) {
-                                        subslide.audioSpeed = 0.9;
+                                        subslide.audioSpeed = 0.85;
                                     }
                                 })
                             });
