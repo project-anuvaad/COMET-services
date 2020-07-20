@@ -143,9 +143,9 @@ class ArticleService extends BaseServiceV2 {
                                     } else {
                                         subslide.audio = '';
                                     }
-                                    // For TTS translations make the audio speed 0.9
+                                    // For TTS translations make the audio speed 0.8
                                     if (tts) {
-                                        subslide.audioSpeed = 0.85;
+                                        subslide.audioSpeed = 0.80;
                                     }
                                 })
                             });
