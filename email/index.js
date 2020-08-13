@@ -170,6 +170,78 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
         })
     }
 
+    // USAGE SAMPLE
+
+    // bulkInviteUserToTranslationAction({
+    //     from: { email: 'hassan94924@gmail.com'},
+    //     to: { email: 'hassan94924@gmail.com'},
+    //     organizationName: 'Test Org',
+    //     organizationId: '1231312',
+    //     invitations: [
+    //         {
+    //             invitation_type: 'invited_to_translate_text',
+    //             videoTitle: 'Test video',
+    //             articleId: 'asdsadasd',
+    //             fromLang: 'english',
+    //             toLang: 'arabic',
+    //             inviteToken: 'asdasdasdsd'
+    //         },{
+    //             invitation_type: 'invited_to_verify_translation',
+    //             videoTitle: 'Test video',
+    //             articleId: 'asdsadasd',
+    //             fromLang: 'english',
+    //             toLang: 'arabic',
+    //             inviteToken: 'asdasdasdsd'
+    //         }
+    //     ]
+    // })
+    const bulkInviteUserToTranslationAction = ({ from, to, organizationName, organizationId, invitations }) => {
+        return new Promise((resolve, reject) => {
+
+            const renderedInvitations = invitations.slice();
+            const textTranslationInvitations = [];
+            const verifyTranslationInvitations = [];
+
+            renderedInvitations.forEach(invitation => {
+                if (invitation.invitation_type === 'invited_to_translate_text') {
+                    invitation.acceptURL = `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/invitations/translateText?t=${invitation.inviteToken}&o=${organizationId}&aid=${invitation.articleId}&s=accepted&email=${to.email}` 
+                    textTranslationInvitations.push(invitation);
+                } else if (invitation.invitation_type === 'invited_to_verify_translation') {
+                    invitation.acceptURL = `${FRONTEND_HOST_PROTOCOL}://${organizationName.replace(/\s/g, '-')}.${FRONTEND_HOST_NAME}/lr?t=${invitation.inviteToken}&o=${organizationId}&redirectTo=${encodeURIComponent(`/translation/article/${invitation.articleId}`)}`;
+                    verifyTranslationInvitations.push(invitation);
+                }
+            })
+
+            const subject = `${invitations.length} new notifications on organization "${organizationName}"`
+            const renderData = {
+                title: subject,
+                fromUser: from.email,
+                toUser: to.email,
+                organizationName,
+                organizationId,
+                verifyTranslationInvitations,
+                textTranslationInvitations,
+            }
+            ejs.renderFile(path.join(__dirname, 'templates', 'bulk_translation_actions_invite.ejs'), renderData, (err, htmlToSend) => {
+                    if (err) return reject(err);
+                    // setup e-mail data, even with unicode symbols
+                    const mailOptions = {
+                        from: 'Videowiki <help@videowiki.org>',
+                        to: to.email,
+                        subject,
+                        html: htmlToSend
+                    };
+
+                    emailVendor.send(mailOptions, function (error, body) {
+                        console.log(error, body);
+                        if (err) return reject(err);
+                        return resolve(body);
+                    })
+            })
+        })
+    }
+
+
     const inviteUserToVerifyTranslation = ({ from, to, organizationName, videoTitle, articleId, fromLang, toLang, toLangCode, extraContent, inviteToken, organizationId }) => {
         return new Promise((resolve, reject) => {
 
@@ -574,5 +646,6 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
         sendBulkExportTranslationsZipFile,
         inviteUserToLeadTranslation,
         inviteUserToLeadVideoTranslations,
+        bulkInviteUserToTranslationAction,
     }
 }
