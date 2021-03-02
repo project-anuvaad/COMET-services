@@ -1,6 +1,6 @@
 {
-  "name": "@videowiki/services",
-  "version": "1.3.0",
+  "name": "@comet-anuvaad/services",
+  "version": "1.0.0",
   "description": "Services wrappers",
   "main": "index.js",
   "scripts": {
@@ -11,5 +11,12 @@
   "dependencies": {
     "ejs": "^3.0.2",
     "superagent": "^5.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/project-anuvaad/COMET-services.git"
+  },
+  "bugs": {
+    "url": "https://github.com/project-anuvaad/COMET-services/issues"
   }
 }
