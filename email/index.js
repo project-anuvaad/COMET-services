@@ -173,8 +173,8 @@ module.exports = ({ EMAIL_SERVICE_API_ROOT, FRONTEND_HOST_NAME, FRONTEND_HOST_PR
     // USAGE SAMPLE
 
     // bulkInviteUserToTranslationAction({
-    //     from: { email: 'hassan94924@gmail.com'},
-    //     to: { email: 'hassan94924@gmail.com'},
+    //     from: { email: ''},
+    //     to: { email: ''},
     //     organizationName: 'Test Org',
     //     organizationId: '1231312',
     //     invitations: [
